@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "906600243535",
+    "firebase_url": "https://lojavirtual-c5dc0.firebaseio.com",
+    "project_id": "lojavirtual-c5dc0",
+    "storage_bucket": "lojavirtual-c5dc0.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:906600243535:android:7c1c0b2d83f57e9750a53a",
+        "android_client_info": {
+          "package_name": "br.com.ricardoaps.lojavirtual"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "906600243535-ofrccrf1kekupr2qqivlout1sq14gm3t.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDbBHh9hHgpFZfW2yTi_RDcgbvQbkVQU10"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "906600243535-ofrccrf1kekupr2qqivlout1sq14gm3t.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
