@@ -1,7 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:lojavirtual/helpers/firebase_errors.dart';
+import 'package:lojavirtual/models/user.dart' as u;
+
 
 class UserManager extends ChangeNotifier {
 
@@ -10,6 +13,8 @@ class UserManager extends ChangeNotifier {
   }
 
   final FirebaseAuth auth = FirebaseAuth.instance;
+  final FirebaseFirestore firestore = FirebaseFirestore.instance;
+
   User user ;
   bool _loading = false;
   bool get loading => _loading;
@@ -18,13 +23,13 @@ class UserManager extends ChangeNotifier {
     _loading = true;
     try {
       final result = await auth.signInWithEmailAndPassword(email: user.email, password: user.password);
-
       // await Future.delayed(Duration(seconds: 4));
 
-      this.user = result.user;
+      //this.user = result.user;
+      _loadCurrentUser(user : result.user);
 
       onSuccess();
-    } on PlatformException catch (e) {
+    } catch (e) {
       //onFail(e.code);
       onFail(getErrorString(e.code));
     }
@@ -35,9 +40,15 @@ class UserManager extends ChangeNotifier {
    _loading = true;
    try  {
      final result = await auth.createUserWithEmailAndPassword(email : user.email, password : user.password);
+
+     user.id = result.user.uid;
      this.user = result.user;
+
+     user.id = result.user.uid;
+     user.saveData();
+
      onSuccess();
-   } on PlatformException catch (e) {
+   } catch (e) {
      //onFail(e.code);
      onFail(getErrorString(e.code));
    }
@@ -49,15 +60,19 @@ class UserManager extends ChangeNotifier {
     notifyListeners();
   }
 
-  void _loadCurrentUser() {
-  final currentUser = auth.currentUser;
+  void _loadCurrentUser({User user}) async {
+  final currentUser = user ?? auth.currentUser;
   if (currentUser != null){
-    user = currentUser;
+    //user = currentUser;
+    final DocumentSnapshot docUser = await firestore.collection('users').doc(currentUser.uid).get();
+    var user = u.User.fromDocument(docUser);
 
     // testar se pegou os dados
-    debugPrint(user.uid);
+    debugPrint(user.id);
     debugPrint(user.email);
+    debugPrint(user.name);
 
+    notifyListeners();
   }
   notifyListeners();
   }
