@@ -85,7 +85,7 @@ class LoginScreen extends StatelessWidget{
                       child: RaisedButton(onPressed: userManager.loading ? null : (){
                       if (formKey.currentState.validate()){
                       context.read<UserManager>().signIn(
-                        user : User(
+                        user : UserData(
                         email: emailController.text,
                         password: passController.text
                         ),
@@ -98,7 +98,8 @@ class LoginScreen extends StatelessWidget{
                       );
                         },
                       onSuccess: (){
-                    // TODO: fechar a tela de login
+                          Navigator.of(context).pop();
+
                     }
 
                     );

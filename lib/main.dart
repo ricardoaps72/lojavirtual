@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:lojavirtual/models/user_manager.dart';
 import 'package:lojavirtual/screens/base/base_screen.dart';
+import 'package:lojavirtual/screens/base/login/login_screen.dart';
 import 'package:lojavirtual/screens/base/signup/signup_screen.dart';
 import 'package:provider/provider.dart';
 
@@ -59,6 +60,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (_) => UserManager(),
+      lazy: false,
       child: MaterialApp(
         title: 'Cloud Loja Virtual',
         debugShowCheckedModeBanner: false,
@@ -74,6 +76,8 @@ class MyApp extends StatelessWidget {
         initialRoute: '/base',
         onGenerateRoute: (settings){
           switch(settings.name){
+            case '/login' :
+              return MaterialPageRoute(builder: (_) => LoginScreen());
             case '/signup' :
               return MaterialPageRoute(builder: (_) => SignupScreen());
             case '/base' :

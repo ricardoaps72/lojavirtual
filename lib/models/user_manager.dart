@@ -1,9 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/services.dart';
 import 'package:lojavirtual/helpers/firebase_errors.dart';
-import 'package:lojavirtual/models/user.dart' as u;
+import 'package:lojavirtual/models/user.dart';
 
 
 class UserManager extends ChangeNotifier {
@@ -15,9 +14,12 @@ class UserManager extends ChangeNotifier {
   final FirebaseAuth auth = FirebaseAuth.instance;
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
 
-  User user ;
+  User user;
+  UserData userData;
+
   bool _loading = false;
   bool get loading => _loading;
+  bool get isLoggedIn => userData != null;
 
   Future<void> signIn({user, Function onFail, Function onSuccess}) async {
     _loading = true;
@@ -42,7 +44,7 @@ class UserManager extends ChangeNotifier {
      final result = await auth.createUserWithEmailAndPassword(email : user.email, password : user.password);
 
      user.id = result.user.uid;
-     this.user = result.user;
+     //this.user = result.user;
 
      user.id = result.user.uid;
      user.saveData();
@@ -55,6 +57,13 @@ class UserManager extends ChangeNotifier {
    _loading = false;
   }
 
+  void signOut(){
+    auth.signOut();
+    userData = null;
+    user = null;
+    notifyListeners();
+  }
+
   set setLoading(bool value){
     _loading = value;
     notifyListeners();
@@ -62,18 +71,24 @@ class UserManager extends ChangeNotifier {
 
   void _loadCurrentUser({User user}) async {
   final currentUser = user ?? auth.currentUser;
+
   if (currentUser != null){
     //user = currentUser;
     final DocumentSnapshot docUser = await firestore.collection('users').doc(currentUser.uid).get();
-    var user = u.User.fromDocument(docUser);
+
+    UserData user = UserData.fromDocument(docUser);
 
     // testar se pegou os dados
     debugPrint(user.id);
     debugPrint(user.email);
     debugPrint(user.name);
 
+    userData = user;
+
     notifyListeners();
+
   }
-  notifyListeners();
+
+  //notifyListeners();
   }
 }

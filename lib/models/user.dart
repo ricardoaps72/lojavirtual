@@ -1,11 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/cupertino.dart';
 
-class User{
+class UserData{
 
-  User({this.email, this.password,this.name,this.confirmPassword, this.id});
+  UserData({this.email, this.password,this.name,this.confirmPassword, this.id});
 
-  User.fromDocument(DocumentSnapshot document){
+  UserData.fromDocument(DocumentSnapshot document){
     id = document.id;
     name = document.get('name') as String;
     email = document.get('email') as String;
