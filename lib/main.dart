@@ -5,8 +5,11 @@ import 'package:lojavirtual/models/product_manager.dart';
 import 'package:lojavirtual/models/user_manager.dart';
 import 'package:lojavirtual/screens/base/base_screen.dart';
 import 'package:lojavirtual/screens/base/login/login_screen.dart';
+import 'package:lojavirtual/screens/base/product/product_screen.dart';
 import 'package:lojavirtual/screens/base/signup/signup_screen.dart';
 import 'package:provider/provider.dart';
+
+import 'models/product.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -89,6 +92,10 @@ class MyApp extends StatelessWidget {
               return MaterialPageRoute(builder: (_) => LoginScreen());
             case '/signup' :
               return MaterialPageRoute(builder: (_) => SignupScreen());
+            case '/product' :
+              return MaterialPageRoute(builder: (_) => ProductScreen(
+                settings.arguments as Product
+              ));
             case '/base' :
             default:
               return MaterialPageRoute(builder: (_) => BaseScreen());
