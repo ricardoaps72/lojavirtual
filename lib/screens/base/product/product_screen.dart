@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:carousel_pro/carousel_pro.dart';
 import 'package:flutter/material.dart';
+import 'package:lojavirtual/models/cart_manager.dart';
 import 'package:lojavirtual/models/product.dart';
 import 'package:lojavirtual/models/user_manager.dart';
 import 'package:provider/provider.dart';
@@ -107,13 +108,14 @@ class ProductScreen extends StatelessWidget{
                   ),
                   if (product.hasStock)
                     Consumer2<UserManager, Product>(
-                        builder: (_, userManger, product, __){
+                        builder: (_, userManager, product, __){
                           return SizedBox(
                             height: 44,
                             child: RaisedButton(
                               onPressed: product.selectedSize != null ? (){
-                                if (userManger.isLoggedIn){
-                                  // TODO: ADICIONAR AO CARINHO
+                                if (userManager.isLoggedIn){
+                                  context.read<CartManager>().addToCart(product);
+                                  Navigator.of(context).pushNamed('/cart');
                                 } else {
                                   Navigator.of(context).pushNamed('/login');
                                 }
@@ -121,7 +123,7 @@ class ProductScreen extends StatelessWidget{
                               color: primaryColor,
                                 textColor: Colors.white,
                                 child: Text(
-                                  userManger.isLoggedIn
+                                  userManager.isLoggedIn
                                       ? 'Adicionar ao carrinho'
                                       : 'Entre para comprar',
                                   style: const TextStyle(fontSize: 18),
