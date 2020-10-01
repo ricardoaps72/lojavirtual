@@ -11,6 +11,7 @@ import 'package:lojavirtual/screens/base/product/product_screen.dart';
 import 'package:lojavirtual/screens/base/signup/signup_screen.dart';
 import 'package:provider/provider.dart';
 
+import 'models/home_manager.dart';
 import 'models/product.dart';
 
 Future<void> main() async {
@@ -74,6 +75,10 @@ class MyApp extends StatelessWidget {
           create: (_) => ProductManager(),
           lazy: false,
         ),
+        ChangeNotifierProvider(
+            create: (_) => HomeManager(),
+          lazy: false,
+        ),
         ChangeNotifierProxyProvider<UserManager, CartManager>(
           create: (_) => CartManager(),
           lazy: false,
@@ -82,6 +87,7 @@ class MyApp extends StatelessWidget {
       ],
       child: MaterialApp(
         title: 'Cloud Loja Virtual',
+
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           //primarySwatch: Colors.blue,

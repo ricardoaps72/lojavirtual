@@ -3,6 +3,7 @@ import 'package:lojavirtual/common/custon_drawer/custon_drawer.dart';
 import 'package:lojavirtual/models/page_manager.dart';
 import 'package:lojavirtual/screens/base/login/login_screen.dart';
 import 'package:lojavirtual/screens/base/products/products_screen.dart';
+import 'package:lojavirtual/screens/home/home_screen.dart';
 import 'package:provider/provider.dart';
 
 class BaseScreen extends StatelessWidget {
@@ -18,12 +19,7 @@ class BaseScreen extends StatelessWidget {
           physics: const NeverScrollableScrollPhysics(),
           children: <Widget>[
            // LoginScreen(),
-            Scaffold(
-              drawer: CustonDrawer(),
-              appBar: AppBar(
-                title: const Text('Home'),
-              ),
-            ),
+            HomeScreen(),
             ProductsScreen(),
             Scaffold(
               drawer: CustonDrawer(),
