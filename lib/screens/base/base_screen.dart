@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:lojavirtual/common/custon_drawer/custon_drawer.dart';
 import 'package:lojavirtual/models/page_manager.dart';
+import 'package:lojavirtual/models/user_manager.dart';
+import 'package:lojavirtual/screens/admins_users/admin_users_screen.dart';
 import 'package:lojavirtual/screens/base/login/login_screen.dart';
 import 'package:lojavirtual/screens/base/products/products_screen.dart';
 import 'package:lojavirtual/screens/home/home_screen.dart';
@@ -14,35 +16,40 @@ class BaseScreen extends StatelessWidget {
 
     return Provider(
         create: (_) => PageManager(pageController),
-        child : PageView(
-          controller: pageController,
-          physics: const NeverScrollableScrollPhysics(),
-          children: <Widget>[
-           // LoginScreen(),
-            HomeScreen(),
-            ProductsScreen(),
-            Scaffold(
-              drawer: CustonDrawer(),
-              appBar: AppBar(
-                title: const Text('Home3'),
-              ),
-            ),
-            Scaffold(
-              drawer: CustonDrawer(),
-              appBar: AppBar(
-                title: const Text('Home4'),
-              ),
-            ),
-            Container(
-              color: Colors.red,
-            ),
-            Container(
-              color: Colors.yellow,
-            ),
-            Container(
-              color: Colors.green,
-            ),
-          ],
+        child : Consumer<UserManager>(
+          builder: (_, userManager, __){
+            return PageView(
+              controller: pageController,
+              physics: const NeverScrollableScrollPhysics(),
+              children: <Widget>[
+                // LoginScreen(),
+                HomeScreen(),
+                ProductsScreen(),
+                Scaffold(
+                  drawer: CustonDrawer(),
+                  appBar: AppBar(
+                    title: const Text('Meus pedidos'),
+                  ),
+                ),
+                Scaffold(
+                  drawer: CustonDrawer(),
+                  appBar: AppBar(
+                    title: const Text('Lojas'),
+                  ),
+                ),
+                if(userManager.adminEnabled)
+                  ...[
+                    AdminUsersScreen(),
+                    Scaffold(
+                      drawer: CustonDrawer(),
+                      appBar: AppBar(
+                        title: const Text('Pedidos'),
+                      ),
+                    ),
+                  ]
+              ],
+            );
+          } ,
         ),
     );
   }

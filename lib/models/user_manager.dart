@@ -20,6 +20,7 @@ class UserManager extends ChangeNotifier {
   bool _loading = false;
   bool get loading => _loading;
   bool get isLoggedIn => userData != null;
+  bool get adminEnabled => userData != null && userData.admin;
 
   Future<void> signIn({user, Function onFail, Function onSuccess}) async {
     _loading = true;
@@ -85,10 +86,18 @@ class UserManager extends ChangeNotifier {
 
     userData = user;
 
+    final docAdmin = await firestore.collection('admins').doc(user.id).get();
+    if (docAdmin.exists){
+      user.admin = true;
+    }
+
+    print(user.admin);
+
     notifyListeners();
 
   }
-
   //notifyListeners();
   }
+
+  //bool get adminEnabled => user != null && userData.admin;
 }
