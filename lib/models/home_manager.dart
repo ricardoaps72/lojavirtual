@@ -9,7 +9,11 @@ class HomeManager extends ChangeNotifier {
    _loadSections();
  }
 
- List<Section> sections = [];
+ List<Section> _sections = [];
+
+ List<Section> _editingSections = [];
+
+ bool editing = false;
 
  final FirebaseFirestore firestore = FirebaseFirestore.instance;
 
@@ -22,6 +26,50 @@ class HomeManager extends ChangeNotifier {
      }
      notifyListeners();
    });
+
+ }
+
+ void addSection(Section section){
+   _editingSections.add(section);
+   notifyListeners();
+ }
+
+ void removeSection(Section section){
+   _editingSections.remove(section);
+   notifyListeners();
+ }
+
+ List<Section> get sections {
+   if(editing)
+     return _editingSections;
+    else
+     return _sections;
+ }
+
+ void enterEditing(){
+   editing = true;
+   _editingSections = _sections.map((s) => s.clone()).toList();
+   notifyListeners();
+ }
+
+ Future<void> saveEditing() async {
+   bool valid = true;
+   for (final section in _editingSections){
+     if(!section.valid()) valid = false;
+   }
+
+   if(!valid) return;
+
+   for(final section in _editingSections){
+     await section.save();
+   }
+   editing = false;
+   notifyListeners();
+
+ }
+ void discardEditing(){
+   editing = false;
+   notifyListeners();
 
  }
 

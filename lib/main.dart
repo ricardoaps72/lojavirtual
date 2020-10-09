@@ -10,6 +10,7 @@ import 'package:lojavirtual/screens/base/cart/cart_screen.dart';
 import 'package:lojavirtual/screens/base/edit_product/edit_product_screen.dart';
 import 'package:lojavirtual/screens/base/login/login_screen.dart';
 import 'package:lojavirtual/screens/base/product/product_screen.dart';
+import 'package:lojavirtual/screens/base/select_product/select_product_screen.dart';
 import 'package:lojavirtual/screens/base/signup/signup_screen.dart';
 import 'package:provider/provider.dart';
 
@@ -118,6 +119,8 @@ class MyApp extends StatelessWidget {
               ));
             case '/cart' :
               return MaterialPageRoute(builder: (_) => CartScreen());
+            case '/select_product' :
+              return MaterialPageRoute(builder: (_) => SelectProductScreen());
             case '/edit_product' :
               return MaterialPageRoute(builder: (_) => EditProductScreen(
                 settings.arguments as Product
