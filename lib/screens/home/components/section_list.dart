@@ -23,7 +23,7 @@ class SectionList extends StatelessWidget {
           children: <Widget>[
             SectionHeader(),
             SizedBox(
-              height: 100,
+              height: 200,
               child: Consumer<Section>(
                 builder: (_, section, __){
                   return ListView.separated(

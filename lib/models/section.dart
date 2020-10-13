@@ -1,11 +1,16 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:lojavirtual/models/section_item.dart';
+import 'package:uuid/uuid.dart';
 
 class Section extends ChangeNotifier {
 
   Section({this.id, this.name, this.items, this.type}) {
     items = items ?? [];
+    originalItems = List.from(items);
   }
 
   Section.formDocument(DocumentSnapshot document){
@@ -17,12 +22,16 @@ class Section extends ChangeNotifier {
   }
 
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
+  final FirebaseStorage storage = FirebaseStorage.instance;
+
   DocumentReference get firetoreRef => firestore.doc('home/$id');
+  StorageReference get storageRef => storage.ref().child('home/$id');
 
   String id;
   String name;
   String type;
   List<SectionItem> items;
+  List<SectionItem> originalItems;
 
   String _error;
   String get error => _error;
@@ -52,10 +61,23 @@ class Section extends ChangeNotifier {
    return error == null;
   }
 
-  Future<void> save() async {
+  Future<void> delete() async {
+    await firetoreRef.delete();
+    for(final item in items){
+      try {
+        final ref = await storage.getReferenceFromUrl(
+            item.image as String
+        );
+        await ref.delete();
+      } catch (e) {}
+    }
+  }
+
+  Future<void> save(int pos) async {
     final Map<String, dynamic> data = {
       'name' : name,
       'type' : type,
+      'pos'  : pos,
     };
 
     if(id == null){
@@ -64,6 +86,34 @@ class Section extends ChangeNotifier {
     } else {
       await firetoreRef.update(data);
     }
+
+    for(final item in items){
+      if(item.image is File){
+        final StorageUploadTask task = storageRef.child(Uuid().v1())
+            .putFile(item.image as File);
+        final StorageTaskSnapshot snapshot = await task.onComplete;
+        final String url = await snapshot.ref.getDownloadURL() as String;
+        item.image = url;
+      }
+    }
+
+    for(final original in originalItems){
+      if(!items.contains(original)){
+        try {
+          final ref = await storage.getReferenceFromUrl(
+              original.image as String);
+          await ref.delete();
+
+        } catch (e) {}
+      }
+    }
+
+    final Map<String, dynamic> itemsData = {
+      'items' : items.map((e) => e.toMap()).toList()
+    };
+
+    await firetoreRef.update(itemsData);
+
   }
 
   Section clone() {
