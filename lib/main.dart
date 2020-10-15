@@ -5,6 +5,7 @@ import 'package:lojavirtual/models/admin_users_manager.dart';
 import 'package:lojavirtual/models/cart_manager.dart';
 import 'package:lojavirtual/models/product_manager.dart';
 import 'package:lojavirtual/models/user_manager.dart';
+import 'package:lojavirtual/screens/address/address_screen.dart';
 import 'package:lojavirtual/screens/base/base_screen.dart';
 import 'package:lojavirtual/screens/base/cart/cart_screen.dart';
 import 'package:lojavirtual/screens/base/edit_product/edit_product_screen.dart';
@@ -12,6 +13,7 @@ import 'package:lojavirtual/screens/base/login/login_screen.dart';
 import 'package:lojavirtual/screens/base/product/product_screen.dart';
 import 'package:lojavirtual/screens/base/select_product/select_product_screen.dart';
 import 'package:lojavirtual/screens/base/signup/signup_screen.dart';
+import 'package:lojavirtual/services/cepaberto_service.dart';
 import 'package:provider/provider.dart';
 
 import 'models/home_manager.dart';
@@ -21,6 +23,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   runApp(MyApp());
+  CepAbertoService().getAddressFromCep('13.483-081').then((address) => print(address));
 
   //FirebaseFirestore.instance.collection('teste').add({'teste': 'teste'});
 
@@ -119,6 +122,8 @@ class MyApp extends StatelessWidget {
               ));
             case '/cart' :
               return MaterialPageRoute(builder: (_) => CartScreen());
+            case '/address' :
+              return MaterialPageRoute(builder: (_) => AddressScreen());
             case '/select_product' :
               return MaterialPageRoute(builder: (_) => SelectProductScreen());
             case '/edit_product' :
