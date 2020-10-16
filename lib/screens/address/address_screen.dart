@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:lojavirtual/common/price_card.dart';
+import 'package:lojavirtual/models/cart_manager.dart';
+import 'package:provider/provider.dart';
 
 import 'components/address_card.dart';
 
@@ -13,6 +16,16 @@ class AddressScreen extends StatelessWidget {
       body: ListView(
         children: [
           AddressCard(),
+          Consumer<CartManager>(
+              builder: (_, cartManager, __){
+                return PriceCard(
+                  buttonText: 'Continuar para o pagamento',
+                  onPressed: cartManager.isAddressValid ? (){
+
+                  }: null,
+                );
+              },
+          )
         ],
       ),
     );

@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import 'address.dart';
+
 class UserData{
 
   UserData({this.email, this.password,this.name,this.confirmPassword, this.id});
@@ -8,7 +10,10 @@ class UserData{
     id = document.id;
     name = document.get('name') as String;
     email = document.get('email') as String;
-
+    if(document.data().containsKey('address')){
+      address = Address.fromMap(
+          document.get('address') as Map<String, dynamic>);
+    }
   }
 
   String id;
@@ -17,6 +22,7 @@ class UserData{
   String password;
   String confirmPassword;
   bool admin = false;
+  Address address;
 
   DocumentReference get firestoreRef =>
       FirebaseFirestore.instance.doc('users/$id');
@@ -33,7 +39,13 @@ class UserData{
     return {
       'name' : name,
       'email' : email,
+      if(address != null)
+        'address' : address.toMap(),
     };
   }
 
+  void setAddress(Address address){
+    this.address = address;
+    saveData();
+  }
 }
