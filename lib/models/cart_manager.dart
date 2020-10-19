@@ -92,6 +92,14 @@ class CartManager extends ChangeNotifier {
     notifyListeners();
   }
 
+  void clear(){
+    for(final cartProduct in  items){
+      userData.cartReference.doc(cartProduct.id).delete();
+    }
+    items.clear();
+    notifyListeners();
+  }
+
   void _updateCartProduct(CartProduct cartProduct){
     if(cartProduct.id != null)
       userData.cartReference.doc(cartProduct.id).update(cartProduct.toCartItemMap());

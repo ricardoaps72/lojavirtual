@@ -13,6 +13,7 @@ import 'package:lojavirtual/screens/base/login/login_screen.dart';
 import 'package:lojavirtual/screens/base/product/product_screen.dart';
 import 'package:lojavirtual/screens/base/select_product/select_product_screen.dart';
 import 'package:lojavirtual/screens/base/signup/signup_screen.dart';
+import 'package:lojavirtual/screens/checkout/checkout_screen.dart';
 import 'package:lojavirtual/services/cepaberto_service.dart';
 import 'package:provider/provider.dart';
 
@@ -121,9 +122,13 @@ class MyApp extends StatelessWidget {
                 settings.arguments as Product
               ));
             case '/cart' :
-              return MaterialPageRoute(builder: (_) => CartScreen());
+              return MaterialPageRoute(builder: (_) => CartScreen(),
+                settings : settings
+              );
             case '/address' :
               return MaterialPageRoute(builder: (_) => AddressScreen());
+            case '/checkout' :
+              return MaterialPageRoute(builder: (_) => CheckoutScreen());
             case '/select_product' :
               return MaterialPageRoute(builder: (_) => SelectProductScreen());
             case '/edit_product' :
@@ -132,7 +137,9 @@ class MyApp extends StatelessWidget {
               ));
             case '/base' :
             default:
-              return MaterialPageRoute(builder: (_) => BaseScreen());
+              return MaterialPageRoute(builder: (_) => BaseScreen(),
+              settings: settings
+              );
           }
         },
       ),
