@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lojavirtual/common/price_card.dart';
 import 'package:lojavirtual/models/cart_manager.dart';
 import 'package:lojavirtual/models/checkout_manager.dart';
+import 'package:lojavirtual/models/page_manager.dart';
 import 'package:provider/provider.dart';
 
 class CheckoutScreen extends StatelessWidget {
@@ -50,10 +51,16 @@ class CheckoutScreen extends StatelessWidget {
                 onPressed: (){
                   checkoutManager.checkout(
                     onStockFail: (e){
-                      Navigator.of(context).popUntil((route) => route.settings.name == '/cart');
+                      Navigator.of(context).popUntil(
+                              (route) => route.settings.name == '/cart');
                     },
-                    onSuccess: (){
-                      Navigator.of(context).popUntil((route) => route.settings.name == '/base');
+                    onSuccess: (order){
+                      Navigator.of(context).popUntil(
+                              (route) => route.settings.name == '/');
+                      Navigator.of(context).pushNamed(
+                          '/confirmation',
+                          arguments: order
+                      );
                     }
                   );
                 },

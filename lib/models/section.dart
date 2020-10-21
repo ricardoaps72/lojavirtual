@@ -64,12 +64,14 @@ class Section extends ChangeNotifier {
   Future<void> delete() async {
     await firetoreRef.delete();
     for(final item in items){
-      try {
-        final ref = await storage.getReferenceFromUrl(
-            item.image as String
-        );
-        await ref.delete();
-      } catch (e) {}
+      if((item.image as String).contains('firebase')){
+        try {
+          final ref = await storage.getReferenceFromUrl(
+              item.image as String
+          );
+          await ref.delete();
+        } catch (e) {}
+      }
     }
   }
 
@@ -98,7 +100,8 @@ class Section extends ChangeNotifier {
     }
 
     for(final original in originalItems){
-      if(!items.contains(original)){
+      if(!items.contains(original) 
+          && (original.image as String).contains('firebase')){
         try {
           final ref = await storage.getReferenceFromUrl(
               original.image as String);
