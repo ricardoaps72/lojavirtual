@@ -9,6 +9,7 @@ import 'package:lojavirtual/screens/base/login/login_screen.dart';
 import 'package:lojavirtual/screens/base/products/products_screen.dart';
 import 'package:lojavirtual/screens/home/home_screen.dart';
 import 'package:lojavirtual/screens/orders/orders_screen.dart';
+import 'package:lojavirtual/screens/stores/stores_screen.dart';
 import 'package:provider/provider.dart';
 
 class BaseScreen extends StatefulWidget {
@@ -43,12 +44,7 @@ class _BaseScreenState extends State<BaseScreen> {
                 HomeScreen(),
                 ProductsScreen(),
                 OrdersScreen(),
-                Scaffold(
-                  drawer: CustonDrawer(),
-                  appBar: AppBar(
-                    title: const Text('Lojas'),
-                  ),
-                ),
+                StoresScreen(),
                 if(userManager.adminEnabled)
                   ...[
                     AdminUsersScreen(),
