@@ -29,7 +29,7 @@ class OrdersManager extends ChangeNotifier {
       for(final doc in event.docs){
         orders.add(Order.fromDocument(doc));
       }
-      print(orders);
+      //print(orders);
       notifyListeners();
     });
 
