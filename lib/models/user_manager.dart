@@ -42,9 +42,9 @@ class UserManager extends ChangeNotifier {
     try {
       final result = await auth.signInWithEmailAndPassword(email: user.email, password: user.password);
       // await Future.delayed(Duration(seconds: 4));
-
       //this.user = result.user;
-      _loadCurrentUser(user : result.user);
+
+      await _loadCurrentUser(user : result.user);
 
       onSuccess();
     } catch (e) {
@@ -71,6 +71,7 @@ class UserManager extends ChangeNotifier {
           );
 
           await userData.saveData();
+          userData.saveToken();
 
           onSuccess();
 
@@ -94,9 +95,12 @@ class UserManager extends ChangeNotifier {
      //this.user = result.user;
 
      user.id = result.user.uid;
-     user.saveData();
+
+     await user.saveData();
+     user.saveToken();
 
      onSuccess();
+
    } catch (e) {
      //onFail(e.code);
      onFail(getErrorString(e.code));
@@ -111,7 +115,7 @@ class UserManager extends ChangeNotifier {
     notifyListeners();
   }
 
-  void _loadCurrentUser({User user}) async {
+  Future<void> _loadCurrentUser({User user}) async {
   final currentUser = user ?? auth.currentUser;
 
   if (currentUser != null){
@@ -119,6 +123,7 @@ class UserManager extends ChangeNotifier {
     final DocumentSnapshot docUser = await firestore.collection('users').doc(currentUser.uid).get();
 
     UserData user = UserData.fromDocument(docUser);
+    user.saveToken();
 
     // testar se pegou os dados
     debugPrint(user.id);
@@ -131,14 +136,10 @@ class UserManager extends ChangeNotifier {
     if (docAdmin.exists){
       user.admin = true;
     }
-
     //print(user.admin);
-
     notifyListeners();
-
   }
   //notifyListeners();
   }
-
   //bool get adminEnabled => user != null && userData.admin;
 }

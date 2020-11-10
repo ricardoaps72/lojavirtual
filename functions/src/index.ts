@@ -1,8 +1,6 @@
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
-import {CieloConstructor, Cielo, TransactionCreditCardRequestModel, EnumBrands} from 'cielo';
-
-//CaptureRequestModel, CancelTransactionRequestModel
+import {CieloConstructor, Cielo, TransactionCreditCardRequestModel, EnumBrands, CaptureRequestModel, CancelTransactionRequestModel} from 'cielo';
 
 admin.initializeApp(functions.config().firebase);
 
@@ -170,10 +168,113 @@ export const authorizeCreditCard = functions.https.onCall(async (data, context) 
   } catch (error) {
       return {
         "success" : false,
-        "error" : error.response[0].Code,
+        "error" : {
+          "code":error.response[0].Code,
+          "message" : error.response[0].Message
+        }
+    };
+  }
+
+});
+
+export const captureCreditCard = functions.https.onCall(async (data, context) => {  
+  if (data === null){
+    return {
+      "success" : false,
+      "error" : {
+        "code" : -1,
+        "message" : "Dados não informados"
+      }
+    };    
+  }
+  if (!context.auth){
+    return {
+      "success" : false,
+      "error" : {
+        "code" : -1,
+        "message" : "Nenhum usuário logado"
+      }
+    };
+  }
+  const captureParams: CaptureRequestModel = {
+    paymentId: data.payId,
+  }
+  
+  try {
+    const capture = await cielo.creditCard.captureSaleTransaction(captureParams);
+
+    if (capture.status === 2){
+      return {"success": true};    
+    } else {
+      return {
+        "success": false,
+        "status": capture.status,
+        "error": {
+          "code": capture.returnCode,
+          "message":capture.returnMessage,
+        }
+      };
+    }
+  } catch (error) {
+    return {
+      "success" : false,
+      "error" : {
+        "code":error.response[0].Code,
         "message" : error.response[0].Message
       }
+  };
+}
+
+});
+
+
+export const cancelCreditCard = functions.https.onCall(async (data, context) => {  
+  if (data === null){
+    return {
+      "success" : false,
+      "error" : {
+        "code" : -1,
+        "message" : "Dados não informados"
+      }
+    };    
   }
+  if (!context.auth){
+    return {
+      "success" : false,
+      "error" : {
+        "code" : -1,
+        "message" : "Nenhum usuário logado"
+      }
+    };
+  }
+  const cancelParams: CancelTransactionRequestModel = {
+    paymentId: data.payId,
+  }
+  
+  try {
+    const cancel = await cielo.creditCard.cancelTransaction(cancelParams);
+
+    if (cancel.status === 10 || cancel.status === 11){
+      return {"success": true};    
+    } else {
+      return {
+        "success": false,
+        "status": cancel.status,
+        "error": {
+          "code": cancel.returnCode,
+          "message":cancel.returnMessage,
+        }
+      };
+    }
+  } catch (error) {
+    return {
+      "success" : false,
+      "error" : {
+        "code":error.response[0].Code,
+        "message" : error.response[0].Message
+      }
+  };
+}
 
 });
 
@@ -204,7 +305,67 @@ export const addMessage = functions.https.onCall( async (data, context) => {
   return {"sucess" : snapshot.id};
 });
 
-export const onNewOrder = functions.firestore.document("/orders/{orderId}").onCreate((snapshot, context) => {
+export const onNewOrder = functions.firestore.document("/orders/{orderId}").onCreate(async (snapshot, context) => {
+  
   const orderId = context.params.orderId;
-  console.log(orderId);
+  
+  const querySnapshot = await admin.firestore().collection("admins").get();
+  
+  const admins = querySnapshot.docs.map(doc => doc.id);
+  
+  let adminsTokens: string[] = [];
+  
+  for(let i = 0; i < admins.length; i++){
+    const tokensAdmin: string[] = await getDeviceTokens(admins[i]);
+    adminsTokens = adminsTokens.concat(tokensAdmin); 
+  }
+
+  await sendPushFCM(
+    adminsTokens,
+    'Novo Pedido',
+    'Nova venda realizada. Pedido: ' + orderId
+  );
+
 });
+
+const ordersStatus = new Map([
+  [0, "Cancelado"],
+  [1, "Em Preparação"],
+  [2, "Em Transporte"],
+  [3, "Entregue"]
+])
+
+export const onOrderStatusChanged = functions.firestore.document("/orders/{orderId}").onUpdate(async (snapshot, context) =>{
+  const beforeStatus = snapshot.before.data().status;
+  const afterStatus = snapshot.after.data().status;
+
+  if (beforeStatus !== afterStatus){
+    const tokensUser = await getDeviceTokens(snapshot.after.data().user)
+    await sendPushFCM(
+      tokensUser,
+      'Pedido: ' + context.params.orderId,
+      'Status atualizado para : ' + ordersStatus.get(afterStatus),
+    )
+  }
+
+});
+
+async function getDeviceTokens(uid : string){
+  const querySnapshot = await admin.firestore().collection("users").doc(uid).collection("tokens").get();
+  const tokens = querySnapshot.docs.map(doc => doc.id);  
+  return tokens;
+}
+
+async function sendPushFCM(tokens: string[], title: string, message: string){
+  if(tokens.length > 0){
+    const payload = {
+      notification : {
+        title: title,
+        body: message,
+        click_action: 'FLUTTER_NOTIFICATION_CLICK'
+      }
+    };
+    return admin.messaging().sendToDevice(tokens, payload);
+  }
+  return;
+}

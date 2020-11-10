@@ -25,6 +25,10 @@ class CieloPayment {
 
       final HttpsCallable callable = functions.httpsCallable(
           'authorizeCreditCard');
+
+      // ignore: deprecated_member_use
+      callable.timeout = const Duration(seconds: 60);
+
       final response = await callable.call(dataSale);
       final data = Map<String, dynamic>.from(response.data as LinkedHashMap);
 
@@ -37,6 +41,50 @@ class CieloPayment {
     } catch (e) {
       debugPrint('$e');
       return Future.error('Falha ao processar transação. Tente novamente');
+    }
+  }
+
+  Future<void> capture(String payId) async {
+    final Map<String, dynamic> captureData = {
+      'payId' : payId
+    };
+
+    final HttpsCallable callable = functions.httpsCallable(
+        'captureCreditCard');
+
+    // ignore: deprecated_member_use
+    callable.timeout = const Duration(seconds: 60);
+
+    final response = await callable.call(captureData);
+    final data = Map<String, dynamic>.from(response.data as LinkedHashMap);
+
+    if (data['success'] as bool) {
+      return data['paymentId'] as String;
+    } else {
+      debugPrint('${data['error']['message']}');
+      return Future.error(data['error']['message']);
+    }
+  }
+
+  Future<void> cancel(String payId) async {
+    final Map<String, dynamic> cancelData = {
+      'payId' : payId
+    };
+
+    final HttpsCallable callable = functions.httpsCallable(
+        'cancelCreditCard');
+
+    // ignore: deprecated_member_use
+    callable.timeout = const Duration(seconds: 60);
+
+    final response = await callable.call(cancelData);
+    final data = Map<String, dynamic>.from(response.data as LinkedHashMap);
+
+    if (data['success'] as bool) {
+      return data['paymentId'] as String;
+    } else {
+      debugPrint('${data['error']['message']}');
+      return Future.error(data['error']['message']);
     }
   }
 
